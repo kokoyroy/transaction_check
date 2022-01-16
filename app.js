@@ -40,10 +40,14 @@ class TransactionChecker {
                         }
                         yield Promise.all(transactionsArray).then(values => transactions = [...values]).catch(console.log);
                         console.log(transactions);
-                        const transactionHash = transactions.find(tx => tx.from.toLowerCase() === randomFromFieldFromTX);
-                        if (transactionHash) {
+                        const transaction = transactions.find(tx => tx.from.toLowerCase() === randomFromFieldFromTX);
+                        if (transaction) {
                             console.log('transaction found on ' + currentBlockNumber);
-                            console.log({ address: transactionHash, timestamp: new Date() });
+                            console.log({
+                                address: transaction,
+                                value: this.web3.utils.fromWei(transaction === null || transaction === void 0 ? void 0 : transaction.value, 'ether'),
+                                timestamp: new Date()
+                            });
                             return;
                         }
                         else {
