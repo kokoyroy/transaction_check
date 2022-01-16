@@ -24,11 +24,11 @@ export class TransactionChecker {
                 console.log('Searching block ' + currentBlockNumber);
                 if (block && block.transactions) {
                     let transactions: Eth.Transaction[] = [];
-                    let transactionsArray: Promise<Eth.Transaction>[] = [];
-                    for (const txAddress of block.transactions) {
-                        transactionsArray.push(this.web3.eth.getTransaction(txAddress.hash));
-                    }
-                    await Promise.all(transactionsArray).then(values => transactions = [...values]).catch(console.log);
+                    let transactionsPromiseArray: Promise<Eth.Transaction>[] = [];
+
+                    transactionsPromiseArray = block.transactions.map(tx => this.web3.eth.getTransaction(tx.hash));
+
+                    await Promise.all(transactionsPromiseArray).then(values => transactions = [...values]).catch(console.log);
                     console.log(transactions);
                     const transaction = transactions.find(tx => tx.from.toLowerCase() === randomFromFieldFromTX);
                     if (transaction) {
