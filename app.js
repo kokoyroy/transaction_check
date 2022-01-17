@@ -18,7 +18,7 @@ const web3_1 = __importDefault(require("web3"));
 require('dotenv').config();
 const INFURA_RINKEBY_URL = 'https://rinkeby.infura.io/v3/';
 const INFURA_ID = (_a = process.env.INFURA_KEY) !== null && _a !== void 0 ? _a : 'some faulty text';
-const TXHash = '0xd79ff08e90c04cc22264c7aafe228d35d99d3c802d19654f27007d83dd4bcc7d';
+const TXHash = '0x4b272a05934c618ae276ee52a235edab60ebd4f7e0a2c9d4500ea8bba6122975';
 class TransactionChecker {
     constructor(infuraID, account) {
         this.web3 = new web3_1.default(INFURA_RINKEBY_URL + infuraID);
