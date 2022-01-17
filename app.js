@@ -18,35 +18,42 @@ const web3_1 = __importDefault(require("web3"));
 require('dotenv').config();
 const INFURA_RINKEBY_URL = 'https://rinkeby.infura.io/v3/';
 const INFURA_ID = (_a = process.env.INFURA_KEY) !== null && _a !== void 0 ? _a : 'some faulty text';
-const randomFromFieldFromTX = '0x8d75f6db12c444e290db995f2650a68159364e25';
+const TXHash = '0xd79ff08e90c04cc22264c7aafe228d35d99d3c802d19654f27007d83dd4bcc7d';
 class TransactionChecker {
     constructor(infuraID, account) {
         this.web3 = new web3_1.default(INFURA_RINKEBY_URL + infuraID);
         this.account = account.toLowerCase();
     }
+    getBlock(blockNumber) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.web3.eth.getBlock(blockNumber, true);
+        });
+    }
+    ;
+    findTransactionInsideBlock(block, TXHash) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return block.transactions.find(tx => tx.hash === TXHash);
+        });
+    }
+    ;
     checkBlock(blockNumber = 'latest') {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 let transactionFound = false;
                 while (!transactionFound) {
-                    let block = yield this.web3.eth.getBlock(blockNumber, true);
+                    let block = yield this.getBlock(blockNumber);
                     let currentBlockNumber = block.number;
                     console.log('Searching block ' + currentBlockNumber);
                     if (block && block.transactions) {
-                        let transactions = [];
-                        let transactionsPromiseArray = [];
-                        transactionsPromiseArray = block.transactions.map(tx => this.web3.eth.getTransaction(tx.hash));
-                        yield Promise.all(transactionsPromiseArray).then(values => transactions = [...values]).catch(console.log);
-                        console.log(transactions);
-                        const transaction = transactions.find(tx => tx.from.toLowerCase() === randomFromFieldFromTX);
+                        const transaction = yield this.findTransactionInsideBlock(block, TXHash);
                         if (transaction) {
-                            console.log('transaction found on ' + currentBlockNumber);
+                            transactionFound = true;
+                            console.log('Transaction Found on block : ', currentBlockNumber);
                             console.log({
-                                address: transaction,
+                                transaction: transaction,
                                 value: this.web3.utils.fromWei(transaction === null || transaction === void 0 ? void 0 : transaction.value, 'ether'),
                                 timestamp: new Date()
                             });
-                            return;
                         }
                         else {
                             console.log('not found :(');
@@ -62,5 +69,5 @@ class TransactionChecker {
     }
 }
 exports.TransactionChecker = TransactionChecker;
-let txChecker = new TransactionChecker(INFURA_ID, randomFromFieldFromTX);
+let txChecker = new TransactionChecker(INFURA_ID, TXHash);
 txChecker.checkBlock();
